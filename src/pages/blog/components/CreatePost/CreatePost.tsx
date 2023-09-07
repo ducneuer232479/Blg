@@ -1,4 +1,3 @@
-import { unwrapResult } from '@reduxjs/toolkit'
 import { addPost, cancelEditingPost, updatePost } from 'pages/blog/blog.slice'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
@@ -22,37 +21,11 @@ export default function CreatePost() {
   const [formData, setFormData] = useState<Post>(initialState)
   const [errorForm, setErrorForm] = useState<null | ErrorForm>(null)
   const editingPost = useSelector((state: RootState) => state.blog.editingPost)
-  const loading = useSelector((state: RootState) => state.blog.loading)
   const dispatch = useAppDispatch()
 
   useEffect(() => {
     setFormData(editingPost || initialState)
   }, [editingPost])
-
-  // const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-  //   event.preventDefault()
-  //   // dispatch đóng gói AsyncThunk còn unwrap để mở gói ra, rồi lấy đc dữ liệu
-  //   if (editingPost) {
-  //     dispatch(
-  //       updatePost({
-  //         postId: editingPost.id,
-  //         body: formData
-  //       })
-  //     )
-  //       .unwrap()
-  //       .then((res) => {
-  //         setFormData(initialState)
-  //         if (errorForm) setErrorForm(null)
-  //       })
-  //       .catch((error) => {
-  //         setErrorForm(error.error)
-  //       })
-  //   } else {
-  //     // const formDataWithId = { ...formData, id: new Date().toISOString() }
-  //     // const formDataWithId = { ...formData }
-  //     dispatch(addPost(formData))
-  //   }
-  // }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -74,12 +47,7 @@ export default function CreatePost() {
           setErrorForm(error.error)
         })
     } else {
-      // const formDataWithId = { ...formData, id: new Date().toISOString() }
-      // const formDataWithId = { ...formData }
       try {
-        // const res = await dispatch(addPost(formData)).unwrap()
-        // const res = await dispatch(addPost(formData))
-        // unwrapResult(res)
         await dispatch(addPost(formData)).unwrap()
         setFormData(initialState)
         if (errorForm) setErrorForm(null)
@@ -91,6 +59,7 @@ export default function CreatePost() {
 
   const handleCancelEditingPost = () => {
     dispatch(cancelEditingPost())
+    setErrorForm(null)
   }
 
   return (
@@ -185,14 +154,25 @@ export default function CreatePost() {
       </div>
       <div>
         {!editingPost && (
-          <button
-            className='group relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-sm font-medium text-gray-900 hover:text-white focus:outline-none focus:ring-4 focus:ring-blue-300 group-hover:from-purple-600 group-hover:to-blue-500 dark:text-white dark:focus:ring-blue-800'
-            type='submit'
-          >
-            <span className='relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900'>
-              Publish Post
-            </span>
-          </button>
+          <>
+            <button
+              className='group relative mr-2 inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-sm font-medium text-gray-900 hover:text-white focus:outline-none focus:ring-4 focus:ring-blue-300 group-hover:from-purple-600 group-hover:to-blue-500 dark:text-white dark:focus:ring-blue-800'
+              type='submit'
+            >
+              <span className='relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900'>
+                Publish Post
+              </span>
+            </button>
+            <button
+              type='reset'
+              className='group relative mb-2 mr-2 inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-red-200 via-red-300 to-yellow-200 p-0.5 text-sm font-medium text-gray-900 focus:outline-none focus:ring-4 focus:ring-red-100 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 dark:text-white dark:hover:text-gray-900 dark:focus:ring-red-400'
+              onClick={() => setFormData(initialState)}
+            >
+              <span className='relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900'>
+                Cancel
+              </span>
+            </button>
+          </>
         )}
         {editingPost && (
           <>
